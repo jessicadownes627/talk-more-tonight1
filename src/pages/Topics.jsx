@@ -1,115 +1,94 @@
-// src/pages/Topics.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../context/UserContext";
 
-const Topics = () => {
-  const { user } = useUserContext();
+const allTopics = [
+  "Baseball (MLB)",
+  "Basketball (NBA)",
+  "Football (NFL)",
+  "Hockey (NHL)",
+  "Politics",
+  "Pop Culture",
+  "TV + Streaming",
+  "Music",
+  "Tech + AI",
+  "Food + Drink",
+  "Fashion",
+  "Fitness + Sports",
+  "Dating + Relationships",
+  "Travel",
+  "Books + Lit",
+  "Gaming",
+  "Memes + Trends"
+];
+
+export default function Topics() {
+  const { user, setSelectedTopics, setCustomTopic } = useUserContext();
+  const [selected, setSelected] = useState([]);
+  const [customInput, setCustomInput] = useState("");
   const navigate = useNavigate();
 
-  const [selectedTopics, setSelectedTopics] = useState([]);
-  const [customTopic, setCustomTopic] = useState("");
-
-  const topics = [
-    { name: "Baseball (MLB)", emoji: "⚾" },
-    { name: "Basketball (NBA)", emoji: "🏀" },
-    { name: "Football (NFL)", emoji: "🏈" },
-    { name: "Hockey (NHL)", emoji: "🏒" },
-    { name: "Politics (Trump, 2025, debates)", emoji: "🏛️" },
-    { name: "Travel & Vacations", emoji: "✈️" },
-    { name: "Music (Taylor Swift, BTS, etc.)", emoji: "🎶" },
-    { name: "Movies & TV Shows", emoji: "🎬" },
-    { name: "Food & Drinks", emoji: "🍕" },
-    { name: "Tech & Gadgets", emoji: "💻" },
-    { name: "Fashion & Style", emoji: "👗" },
-    { name: "Fitness & Health", emoji: "💪" },
-    { name: "Books & Literature", emoji: "📚" },
-    { name: "Dating & Relationships", emoji: "💘" },
-    { name: "Social Media Trends", emoji: "📱" },
-    { name: "Weekend Plans", emoji: "🌆" },
-    { name: "Current Events", emoji: "📰" },
-    { name: "Art & Culture", emoji: "🎨" },
-    { name: "Animals & Pets", emoji: "🐶" },
-    { name: "Environmental Issues", emoji: "🌍" },
-    { name: "Hobbies & Interests", emoji: "🎮" },
-  ];
-
-  const handleCheckboxChange = (e) => {
-    const { value, checked } = e.target;
-    setSelectedTopics((prevTopics) =>
-      checked ? [...prevTopics, value] : prevTopics.filter((topic) => topic !== value)
+  const toggleTopic = (topic) => {
+    setSelected((prev) =>
+      prev.includes(topic)
+        ? prev.filter((t) => t !== topic)
+        : [...prev, topic]
     );
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    // Navigate to the next page (TonightsTalkTips) and pass the selected topics and custom topic
-    navigate("/tonightstalktips", {
-      state: { selectedTopics, customTopic },
-    });
+  const handleNext = () => {
+    setSelectedTopics(selected);
+    setCustomTopic(customInput.trim());
+    navigate("/TonightsTalkTips");
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 text-midnight px-4 py-8 font-poppins">
-      <div className="max-w-xl mx-auto bg-white bg-opacity-80 p-6 rounded-2xl shadow-md">
-        <h1 className="text-5xl font-bold mb-6 text-center" style={{ fontFamily: 'Bad Script, cursive', color: "#003366" }}>
-          💫 Talk More Tonight 💫
-        </h1>
-        <h2 className="text-xl font-medium text-center mb-4" style={{ color: "#003366" }}>
-          Hey {user.name}, let's talk about {user.dateName} 😏
-        </h2>
-        <h3 className="text-lg text-center mb-8" style={{ color: "#003366" }}>
-          What's {user.dateName} into...? Besides you? 😜
-        </h3>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-lg font-medium mb-2" style={{ color: "#003366" }}>
-              Pick some fun topics to get to know {user.dateName} better! 🎉
-            </label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {topics.map((topic) => (
-                <div
-                  key={topic.name}
-                  className="flex items-center border-2 border-gray-300 p-3 rounded-lg shadow-sm hover:bg-pink-200 transition"
-                >
-                  <input
-                    type="checkbox"
-                    id={topic.name}
-                    value={topic.name}
-                    onChange={handleCheckboxChange}
-                    className="mr-3"
-                  />
-                  <label htmlFor={topic.name} className="text-lg flex items-center" style={{ color: "#003366" }}>
-                    <span className="mr-2">{topic.emoji}</span>
-                    {topic.name}
-                  </label>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="mb-4">
-            <label className="block text-lg font-medium mb-2" style={{ color: "#003366" }}>
-              Any specific topic you'd like to bring up? 💬
-            </label>
-            <input
-              type="text"
-              value={customTopic}
-              onChange={(e) => setCustomTopic(e.target.value)}
-              placeholder="Type your own topic here..."
-              className="w-full p-2 rounded-md border border-gray-300 shadow-sm"
-            />
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-pink-200 via-purple-300 to-blue-400 p-8 font-poppins text-midnight">
+      <h1 className="text-4xl font-bold mb-4 text-center">
+        💖 What’s {user.dateName || "your date"} into? Besides YOU! 😉
+      </h1>
+      <p className="text-center mb-6">Pick a few things that get them chatting!</p>
+
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+        {allTopics.map((topic) => (
           <button
-            type="submit"
-            className="mt-6 bg-pink-500 hover:bg-pink-600 text-white py-2 px-6 rounded-2xl"
+            key={topic}
+            onClick={() => toggleTopic(topic)}
+            className={`px-4 py-2 rounded-2xl shadow-md transition-all duration-200 font-medium border-2 text-center text-sm md:text-base whitespace-nowrap
+              ${selected.includes(topic)
+                ? "bg-white bg-opacity-80 border-midnight text-midnight"
+                : "bg-white bg-opacity-30 border-white text-white hover:bg-white hover:text-midnight"}`}
           >
-            Let's Talk!
+            {topic}
           </button>
-        </form>
+        ))}
+      </div>
+
+      <div className="mb-8">
+        <label className="block mb-2 font-semibold">💬 Got something specific in mind?</label>
+        <input
+          type="text"
+          value={customInput}
+          onChange={(e) => setCustomInput(e.target.value)}
+          placeholder="Type your own topic..."
+          className="w-full p-2 rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-midnight"
+        />
+      </div>
+
+      <div className="flex justify-between">
+        <button
+          onClick={() => navigate("/")}
+          className="bg-pink-500 text-white px-4 py-2 rounded-2xl shadow-md hover:bg-pink-600"
+        >
+          ⬅️ Back
+        </button>
+        <button
+          onClick={handleNext}
+          className="bg-blue-500 text-white px-4 py-2 rounded-2xl shadow-md hover:bg-blue-600"
+        >
+          Next: Talk Tips ✨
+        </button>
       </div>
     </div>
   );
-};
-
-export default Topics;
+}

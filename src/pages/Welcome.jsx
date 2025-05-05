@@ -1,79 +1,81 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useUserContext } from "../context/UserContext"; // Access context
+import { useUserContext } from "../context/UserContext";
 
-const Welcome = () => {
-  const { setUser } = useUserContext();  // Function to set user data
-  const navigate = useNavigate();  // Function to navigate to other pages
+export default function Welcome() {
+  const { user, setUser } = useUserContext();
+  const navigate = useNavigate();
 
-  const [name, setName] = useState("");
-  const [dateName, setDateName] = useState("");
-  const [city, setCity] = useState("");
+  const [form, setForm] = useState({
+    yourName: user.yourName || "",
+    dateName: user.dateName || "",
+    location: user.location || "",
+  });
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Set user data into context
-    setUser({ name, dateName, city });
-    // Navigate to topics page
+    setUser(form);
     navigate("/topics");
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 text-midnight px-4 py-8 font-poppins">
-      <div className="max-w-xl mx-auto bg-white p-6 rounded-2xl shadow-md">
-        <h1 className="text-5xl font-bold mb-6 text-center" style={{ fontFamily: 'Bad Script, cursive', color: "#003366" }}>
-          💫 Talk More Tonight 💫
+    <div className="min-h-screen bg-gradient-to-br from-pink-200 via-purple-300 to-blue-400 flex items-center justify-center p-8 font-poppins text-midnight">
+      <div className="bg-white bg-opacity-80 p-10 rounded-3xl shadow-2xl max-w-md w-full text-center">
+        <h1 className="text-5xl font-bold mb-6 font-bad-script text-midnight">
+          Welcome to Your Dating Concierge 💘
         </h1>
-        <h2 className="text-xl font-medium text-center mb-8" style={{ color: "#003366" }}>
-          A fun, fast way to feel prepared for your date tonight ✨
-        </h2>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-lg font-medium mb-2" style={{ color: "#003366" }}>
-              Your Name:
-            </label>
+        <p className="text-lg mb-6">
+          Let’s get to know you and your date so we can help you shine tonight ✨
+        </p>
+        <form onSubmit={handleSubmit} className="space-y-4 text-left">
+          <div>
+            <label className="block font-semibold mb-1">Your Name</label>
             <input
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g., Homer"
-              className="w-full p-2 rounded-md border border-gray-300 shadow-sm"
+              name="yourName"
+              value={form.yourName}
+              onChange={handleChange}
+              placeholder="e.g. Jordan"
+              className="w-full p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400"
+              required
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-lg font-medium mb-2" style={{ color: "#003366" }}>
-              Date's Name:
-            </label>
+          <div>
+            <label className="block font-semibold mb-1">Your Date’s Name</label>
             <input
               type="text"
-              value={dateName}
-              onChange={(e) => setDateName(e.target.value)}
-              placeholder="e.g., Marge"
-              className="w-full p-2 rounded-md border border-gray-300 shadow-sm"
+              name="dateName"
+              value={form.dateName}
+              onChange={handleChange}
+              placeholder="e.g. Taylor"
+              className="w-full p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-400"
+              required
             />
           </div>
-          <div className="mb-6">
-            <label className="block text-lg font-medium mb-2" style={{ color: "#003366" }}>
-              City:
-            </label>
+          <div>
+            <label className="block font-semibold mb-1">Location</label>
             <input
               type="text"
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              placeholder="e.g., New York"
-              className="w-full p-2 rounded-md border border-gray-300 shadow-sm"
+              name="location"
+              value={form.location}
+              onChange={handleChange}
+              placeholder="e.g. Miami, FL"
+              className="w-full p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              required
             />
           </div>
           <button
             type="submit"
-            className="mt-6 bg-pink-500 hover:bg-pink-600 text-white py-2 px-6 rounded-2xl"
+            className="w-full mt-6 bg-midnight text-white py-2 rounded-2xl hover:bg-blue-800 transition"
           >
-            Let's Talk!
+            Let’s Go! 💫
           </button>
         </form>
       </div>
     </div>
   );
-};
-
-export default Welcome;
+}

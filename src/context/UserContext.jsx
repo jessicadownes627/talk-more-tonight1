@@ -1,20 +1,28 @@
 import React, { createContext, useState, useContext } from "react";
 
-// Create the UserContext
 const UserContext = createContext();
 
-// UserProvider component to wrap the app and provide user data
-export const UserProvider = ({ children }) => {
+export function UserProvider({ children }) {
   const [user, setUser] = useState({ name: "", dateName: "", city: "" });
+  const [selectedTopics, setSelectedTopics] = useState([]);
+  const [customTopic, setCustomTopic] = useState("");
 
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <UserContext.Provider
+      value={{
+        user,
+        setUser,
+        selectedTopics,
+        setSelectedTopics,
+        customTopic,
+        setCustomTopic,
+      }}
+    >
       {children}
     </UserContext.Provider>
   );
-};
+}
 
-// Custom hook to use user context
-export const useUserContext = () => {
+export function useUserContext() {
   return useContext(UserContext);
-};
+}

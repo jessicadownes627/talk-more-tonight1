@@ -1,80 +1,85 @@
-// src/pages/News.jsx
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useUserContext } from "../context/UserContext";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useLocation } from "react-router-dom";
+
+const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
 const News = () => {
-  const { user } = useUserContext();
-  const navigate = useNavigate();
-
-  const [newsArticles, setNewsArticles] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const location = useLocation();
+  const { selectedTopics = [], customInput = "" } = location.state || {};
+  const [newsByTopic, setNewsByTopic] = useState({});
   const [error, setError] = useState(null);
 
-  const fetchNews = async () => {
-    try {
-      // Constructing query string based on user's selected topics
-      const topicQuery = user.selectedTopics.join(" OR "); // Assuming selectedTopics is in user context
-      const response = await axios.get(
-        `https://newsapi.org/v2/everything?q=${topicQuery}&apiKey=${process.env.REACT_APP_NEWS_API_KEY}`
-      );
-      setNewsArticles(response.data.articles);
-      setLoading(false);
-    } catch (err) {
-      setError("Failed to load news articles.");
-      setLoading(false);
-    }
-  };
+  const apiKey = "f15123069c794e60817dfcef2998ea0a";
 
   useEffect(() => {
-    if (user.selectedTopics.length > 0) {
-      fetchNews();
-    }
-  }, [user.selectedTopics]);
+    const fetchNews = async () => {
+      let allTopics = [...selectedTopics];
+      if (customInput.trim()) allTopics.push(customInput.trim());
+
+      let results = {};
+      for (const topic of allTopics) {
+        try {
+          const res = await axios.get(
+            `https://newsapi.org/v2/top-headlines?q=${encodeURIComponent(topic)}&language=en&pageSize=3&apiKey=${apiKey}`
+          );
+          results[topic] = res.data.articles.filter(
+            (article) =>
+              article.title.length > 20 &&
+              !article.title.toLowerCase().includes("betting") &&
+              article.source?.name
+          );
+        } catch (err) {
+          if (err.response?.status === 429) {
+            setError("Too many requests! Please wait a moment and try again.");
+            break;
+          } else {
+            console.error(`Error fetching news for ${topic}:`, err);
+            setError("Something went wrong while loading news.");
+          }
+        }
+        await delay(1100); // Wait 1.1s before the next request
+      }
+      setNewsByTopic(results);
+    };
+
+    fetchNews();
+  }, [selectedTopics, customInput]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 text-midnight px-4 py-8 font-poppins">
-      <div className="max-w-2xl mx-auto bg-white bg-opacity-80 p-6 rounded-2xl shadow-md">
-        <h1 className="text-3xl font-bold mb-6 text-center" style={{ color: "#003366" }}>
-          📰 Latest News for Your Date Chat
-        </h1>
-
-        {loading ? (
-          <p>Loading news...</p>
-        ) : error ? (
-          <p>{error}</p>
-        ) : (
-          <ul className="space-y-4">
-            {newsArticles.map((article, index) => (
-              <li key={index} className="border-b pb-4">
-                <a href={article.url} target="_blank" rel="noopener noreferrer" className="text-xl font-semibold text-blue-700 hover:underline">
-                  {article.title}
-                </a>
-                <p className="text-sm text-gray-700 mt-1">{article.description}</p>
-                <p className="text-xs text-gray-500 mt-1">
-                  {article.source.name} · {new Date(article.publishedAt).toLocaleDateString()}
-                </p>
-              </li>
-            ))}
-          </ul>
-        )}
-
-        <div className="flex justify-between mt-8">
-          <button
-            onClick={() => navigate("/tonightstalktips")}
-            className="bg-pink-400 hover:bg-pink-500 text-white py-2 px-4 rounded-2xl"
-          >
-            ⬅️ Back
-          </button>
-          <button
-            onClick={() => navigate("/events")}
-            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-2xl"
-          >
-            Next ➡️
-          </button>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-pink-200 via-purple-300 to-blue-200 p-6 text-midnight font-sans">
+      <h1 className="text-3xl font-bold mb-4">Hot Headlines for Tonight 💫</h1>
+      {error && <p className="text-red-600 font-semibold">{error}</p>}
+      {!error &&
+        Object.entries(newsByTopic).map(([topic, articles]) => (
+          <div key={topic} className="mb-6">
+            <h2 className="text-xl font-semibold mb-2 text-midnight">
+              {topic}
+            </h2>
+            {articles.length > 0 ? (
+              <ul className="list-disc ml-6">
+                {articles.map((article, i) => (
+                  <li key={i}>
+                    <a
+                      href={article.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-700 underline"
+                    >
+                      {article.title}
+                    </a>
+                    <span className="text-sm text-gray-600 block">
+                      {article.source.name} –{" "}
+                      {new Date(article.publishedAt).toLocaleDateString()}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-gray-600">No major news found for this topic.</p>
+            )}
+          </div>
+        ))}
     </div>
   );
 };
