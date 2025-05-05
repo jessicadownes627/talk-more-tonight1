@@ -1,68 +1,74 @@
-// COMPLETE TonightsTalkTips.jsx
-// This file contains rotating tips for 18+ topics and supports custom user input
-// Paste into src/pages/TonightsTalkTips.jsx in your React app
+// src/pages/TonightsTalkTips.jsx
 
-import React from "react";
+import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { promptData, genericFallbacks } from "../data/promptData";
-
-const getRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
 const TonightsTalkTips = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { topics = [], userName = "" } = location.state || {};
+  const { topics = [], city = "" } = location.state || {};
 
-  const handleBack = () => {
-    navigate("/topics", { state: { userName } });
+  const getRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+  const buildTip = (topic) => {
+    const data = promptData[topic] || {};
+    return {
+      topic,
+      summary: data.summary || "This topic could totally win someone over.",
+      fact: getRandom(data.facts || genericFallbacks.facts),
+      ask: getRandom(data.ask || genericFallbacks.ask),
+      open: getRandom(data.open || genericFallbacks.open),
+    };
   };
 
-  const handleNext = () => {
-    navigate("/news", { state: { topics, userName } });
+  const [tips, setTips] = useState(topics.map(buildTip));
+
+  const shuffleTips = () => {
+    setTips(topics.map(buildTip));
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-200 via-purple-200 to-blue-200 text-midnight p-6">
-      <div className="max-w-3xl mx-auto">
-        <h1 className="text-4xl font-script text-center mb-6 drop-shadow-glow">
-          Confidence boost, coming right up 💫
+    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100 text-midnight p-6">
+      <div className="max-w-5xl mx-auto">
+        <h1 className="text-3xl font-script text-center mb-10">
+          Stay sharp, look cute — here’s what’s going on 😉
         </h1>
 
-        {topics.map((topic, i) => {
-          const key = topic.toLowerCase();
-          const prompt = promptData[key];
+        {tips.map((tip, index) => (
+          <div
+            key={index}
+            className="bg-white bg-opacity-90 rounded-xl shadow-md p-5 mb-6"
+          >
+            <h2 className="text-xl font-bold mb-2">{tip.topic}</h2>
+            <p><span className="font-semibold">💡 What To Know:</span> {tip.summary}</p>
+            <p><span className="font-semibold">✨ Fun Fact:</span> {tip.fact}</p>
+            <p><span className="font-semibold">❓ What To Ask:</span> {tip.ask}</p>
+            <p><span className="font-semibold">💬 Keep It Going:</span> {tip.open}</p>
+          </div>
+        ))}
 
-          const summary = prompt?.summary || "This topic could totally win someone over.";
-          const fact = prompt ? getRandom(prompt.facts) : getRandom(genericFallbacks.facts);
-          const ask = prompt ? getRandom(prompt.ask) : getRandom(genericFallbacks.ask);
-          const open = prompt ? getRandom(prompt.open) : getRandom(genericFallbacks.open);
-
-          return (
-            <div
-              key={i}
-              className="bg-white bg-opacity-80 rounded-xl shadow-md p-5 mb-6"
-            >
-              <h2 className="text-2xl font-semibold mb-2 capitalize">{topic}</h2>
-              <p><strong>💡 What it is:</strong> {summary}</p>
-              <p><strong>✨ Fun fact:</strong> {fact}</p>
-              <p><strong>❓ What to ask:</strong> {ask}</p>
-              <p><strong>💬 Keep it going:</strong> {open}</p>
-            </div>
-          );
-        })}
-
-        <div className="flex justify-between mt-10">
+        <div className="flex justify-center mb-10">
           <button
-            onClick={handleBack}
+            onClick={shuffleTips}
+            className="text-blue-700 underline hover:text-purple-600 transition-all"
+          >
+            🔁 Shuffle the Tips
+          </button>
+        </div>
+
+        <div className="flex justify-between">
+          <button
+            onClick={() => navigate("/topics", { state: { city } })}
             className="bg-white text-midnight font-medium px-5 py-2 rounded-full shadow hover:scale-105 transition-transform"
           >
             ← Back
           </button>
           <button
-            onClick={handleNext}
-            className="bg-white text-midnight font-semibold px-6 py-2 rounded-full shadow-lg hover:scale-105 transition-transform"
+            onClick={() => navigate("/news", { state: { topics, city } })}
+            className="bg-white text-midnight font-semibold px-6 py-2 rounded-full shadow hover:scale-105 transition-transform"
           >
-            Get Headlines →
+            Next: Here's the Headlines →
           </button>
         </div>
       </div>

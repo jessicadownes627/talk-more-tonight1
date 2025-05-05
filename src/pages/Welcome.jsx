@@ -47,7 +47,7 @@ const Welcome = () => {
           Talk More Tonight
         </h1>
         <p className="text-lg text-midnight italic mb-6">
-          A little magic, a little mischief... let’s get you ready to charm ✨
+          A quick and easy way to talk more tonight. A little magic and a lot of fun✨ Talk to Us before you talk to Them.
         </p>
 
         <div className="flex flex-col gap-4 w-full mb-8">

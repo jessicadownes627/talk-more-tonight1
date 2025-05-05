@@ -1,141 +1,142 @@
+// src/pages/Topics.jsx
+
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
-const topicSections = [
-  {
-    title: "🧠 Smart & Curious",
-    topics: [
-      { label: "Politics 🗳️", value: "politics" },
-      { label: "Tech & Gadgets 💻", value: "tech" },
-      { label: "Travel 🌍", value: "travel" },
-      { label: "Food & Drinks 🍣", value: "food" },
-      { label: "Dating & Relationships ❤️", value: "dating" },
-      { label: "Business & Money 💼", value: "business" }, // NEW
-    ],
-  },
-  {
-    title: "🎬 Culture & Entertainment",
-    topics: [
-      { label: "Film 🎬", value: "film" },
-      { label: "TV & Streaming 📺", value: "streaming" },
-      { label: "Reality TV 💅", value: "reality tv" },
-      { label: "Celebrity News 🌟", value: "celebrity" },
-      { label: "Music 🎵", value: "music" },
-      { label: "Fashion 👗", value: "fashion" },
-      { label: "Shopping 🛍️", value: "shopping" },
-      { label: "Video Games 🎮", value: "gaming" }, // NEW
-    ],
-  },
-  {
-    title: "🏆 Sports",
-    topics: [
-      { label: "Football 🏈", value: "nfl" },
-      { label: "Basketball 🏀", value: "nba" },
-      { label: "Baseball ⚾", value: "mlb" },
-      { label: "Hockey 🏒", value: "nhl" },
-      { label: "College Sports 🎓", value: "college sports" },
-      { label: "Golf ⛳", value: "golf" }, // NEW
-    ],
-  },
-  {
-    title: "🔥 What's Hot",
-    topics: [
-      { label: "Award Shows 🏆", value: "award shows" },
-      { label: "Major Races 🐎", value: "races" },
-      { label: "Festivals 🎭", value: "festivals" },
-      { label: "TV Finales 📺", value: "finales" },
-      { label: "Celebrity Scandals 🔥", value: "celebrity drama" },
-      { label: "Pop Culture Buzz 💥", value: "trending" },
-      { label: "Weird Holidays 🧁", value: "national days" },
-      { label: "Astrology 🔮", value: "astrology" },
-    ],
-  },
-];
+const topicSections = {
+  "Smart & Curious 🧠": [
+    "Politics 🗳️",
+    "Tech & Gadgets 💻",
+    "Travel 🌍",
+    "Food & Drinks 🥓",
+    "Dating & Relationships ❤️",
+    "Business & Money 💼",
+  ],
+  "Culture & Entertainment 🎬": [
+    "Film 🎬",
+    "TV & Streaming 📺",
+    "Reality TV 💅",
+    "Celebrity News 🌟",
+    "Music 🎵",
+    "Fashion 👗",
+    "Shopping 🛍️",
+    "Video Games 🎮",
+  ],
+  "Sports 🏆": [
+    "Football 🏈",
+    "Basketball 🏀",
+    "Baseball ⚾",
+    "Hockey 🏒",
+    "College Sports 🎓",
+    "Golf ⛳",
+  ],
+  "What’s Hot 🔥": [
+    "Award Shows 🏆",
+    "Major Races 🐎",
+    "Festivals 🎊",
+    "TV Finales 📺",
+    "Celebrity Scandals 🔥",
+    "Pop Culture Buzz 💥",
+    "Weird Holidays 🧁",
+    "Astrology 🧿",
+  ],
+};
 
 const Topics = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { userName = "J", dateName = "your date", city = "" } = location.state || {};
+
   const [selectedTopics, setSelectedTopics] = useState([]);
-  const [customTopic, setCustomTopic] = useState("");
 
-  const userName = location.state?.userName || "";
-
-  const toggleTopic = (value) => {
+  const toggleTopic = (topic) => {
     setSelectedTopics((prev) =>
-      prev.includes(value)
-        ? prev.filter((v) => v !== value)
-        : [...prev, value]
+      prev.includes(topic) ? prev.filter((t) => t !== topic) : [...prev, topic]
     );
   };
 
   const handleNext = () => {
-    const topicsToPass = [...selectedTopics];
-    if (customTopic.trim()) topicsToPass.push(customTopic.trim());
+    const actualTopics = [...selectedTopics];
+    const wildcardIndex = actualTopics.indexOf("Wildcard Convo 💬");
+
+    if (wildcardIndex !== -1) {
+      const allTopics = Object.values(topicSections).flat();
+      const randomTopic = allTopics[Math.floor(Math.random() * allTopics.length)];
+      actualTopics[wildcardIndex] = randomTopic;
+    }
+
     navigate("/tonightstalktips", {
-      state: {
-        topics: topicsToPass,
-        userName: userName,
-      },
+      state: { userName, dateName, city, topics: actualTopics },
     });
   };
 
+  const wildcardSelected = selectedTopics.includes("Wildcard Convo 💬");
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-300 via-purple-300 to-blue-300 text-midnight p-6">
-      <div className="max-w-3xl mx-auto">
-        <h1 className="text-4xl font-script text-center mb-6 drop-shadow-glow">
-          {userName
-            ? `${userName}, what is your date into… besides YOU? 😉`
-            : "What is your date into… besides you? 😉"}
+    <div className="min-h-screen bg-gradient-to-br from-pink-300 via-purple-200 to-blue-200 text-midnight p-6">
+      <div className="max-w-5xl mx-auto">
+        <h1 className="text-3xl font-script text-center mb-10">
+          {userName}, what is your date into... <span className="italic">besides YOU! 😉</span>
         </h1>
 
-        {topicSections.map((section) => (
-          <div key={section.title} className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4">{section.title}</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {section.topics.map((topic) => (
+        {Object.entries(topicSections).map(([section, topics]) => (
+          <div key={section} className="mb-8">
+            <h2 className="text-xl font-bold mb-4">{section}</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {topics.map((topic) => (
                 <label
-                  key={topic.value}
-                  className="flex items-center bg-white bg-opacity-70 rounded-lg px-4 py-2 cursor-pointer hover:scale-105 transition-transform"
+                  key={topic}
+                  className={`flex items-center px-4 py-2 rounded-lg shadow-sm transition-all cursor-pointer ${
+                    selectedTopics.includes(topic)
+                      ? "bg-white border-2 border-purple-400"
+                      : "bg-white bg-opacity-90"
+                  }`}
                 >
                   <input
                     type="checkbox"
-                    className="mr-3"
-                    checked={selectedTopics.includes(topic.value)}
-                    onChange={() => toggleTopic(topic.value)}
+                    checked={selectedTopics.includes(topic)}
+                    onChange={() => toggleTopic(topic)}
+                    className="mr-2 h-4 w-4 text-purple-600"
                   />
-                  <span>{topic.label}</span>
+                  {topic}
                 </label>
               ))}
             </div>
           </div>
         ))}
 
-        {/* Custom topic input */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-2">Other? Tell us! ✍️</h2>
-          <input
-            type="text"
-            placeholder="Anything specific you're into?"
-            value={customTopic}
-            onChange={(e) => setCustomTopic(e.target.value)}
-            className="w-full px-4 py-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-400"
-          />
+        {/* Wildcard Convo Separate Box */}
+        <div className="mt-10 mb-10">
+          <h2 className="text-xl font-bold mb-2">❓ Not sure what to talk about tonight?</h2>
+          <label
+            className={`block px-6 py-4 rounded-lg text-lg font-medium text-center shadow-md cursor-pointer transition-all ${
+              wildcardSelected
+                ? "bg-white border-2 border-purple-400"
+                : "bg-white bg-opacity-90"
+            }`}
+          >
+            <input
+              type="checkbox"
+              checked={wildcardSelected}
+              onChange={() => toggleTopic("Wildcard Convo 💬")}
+              className="mr-2 h-5 w-5 text-purple-600"
+            />
+            🎲 Wildcard Convo 💬 — We’ll surprise you!
+          </label>
         </div>
 
-        {/* Navigation buttons */}
-        <div className="flex justify-between mt-10">
+        <div className="flex justify-between">
           <button
             onClick={() => navigate("/")}
             className="bg-white text-midnight font-medium px-5 py-2 rounded-full shadow hover:scale-105 transition-transform"
           >
-            ← Back
+            ← Back to Home
           </button>
           <button
             onClick={handleNext}
-            className="bg-white text-midnight font-semibold px-6 py-2 rounded-full shadow-lg hover:scale-105 transition-transform"
-            disabled={selectedTopics.length === 0 && !customTopic.trim()}
+            className="bg-white text-midnight font-semibold px-6 py-2 rounded-full shadow hover:scale-105 transition-transform"
           >
-            Next →
+            Next Up: Tonight's Talk Tips →
           </button>
         </div>
       </div>
