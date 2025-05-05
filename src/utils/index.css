@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Bad+Script&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Default font for body */
+body {
+  font-family: 'Inter', sans-serif;
+  animation: fadeIn 1.2s ease-out forwards;
+  background-color: transparent;
+}
+
+/* Script font for titles */
+.font-script {
+  font-family: 'Bad Script', cursive;
+}
+
+/* Midnight blue custom text */
+.text-midnight {
+  color: #0a2540;
+}
+
+/* Soft glowing text shadow */
+.drop-shadow-glow {
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+}
+
+/* Star sparkle animation */
+@keyframes pulseSlow {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+}
+
+.animate-pulseSlow {
+  animation: pulseSlow 4s ease-in-out infinite;
+}
+
+/* Smooth page fade-in */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Optional smoother focus rings on form elements */
+input:focus {
+  outline: none;
+  ring-width: 2px;
+  ring-offset: 2px;
+}
