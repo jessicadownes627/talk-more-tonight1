@@ -1,5 +1,3 @@
-// src/pages/Events.jsx
-
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -68,20 +66,32 @@ const Events = () => {
 
         <div className="bg-white rounded-xl shadow p-4 mb-6">
           <h2 className="text-lg font-semibold mb-2">🏟️ Major Matchups</h2>
-          <ul className="list-disc list-inside">
-            {mockSports.map((game, i) => (
-              <li key={i}>{game}</li>
-            ))}
-          </ul>
+          {mockSports.length > 0 ? (
+            <ul className="list-disc list-inside">
+              {mockSports.map((game, i) => (
+                <li key={i}>{game}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-600 italic">
+              ✨ We’re still gathering tonight’s matchups... check back soon!
+            </p>
+          )}
         </div>
 
         <div className="bg-white rounded-xl shadow p-4 mb-6">
           <h2 className="text-lg font-semibold mb-2">🎉 Local Vibes</h2>
-          <ul className="list-disc list-inside">
-            {mockEvents.map((event, i) => (
-              <li key={i}>{event}</li>
-            ))}
-          </ul>
+          {mockEvents.length > 0 ? (
+            <ul className="list-disc list-inside">
+              {mockEvents.map((event, i) => (
+                <li key={i}>{event}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-600 italic">
+              ✨ No local plans yet — but something fun is always brewing.
+            </p>
+          )}
         </div>
 
         <div className="flex justify-between mt-10">
