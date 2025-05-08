@@ -1,7 +1,7 @@
-// src/pages/News.jsx
 
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { newsKeywordMap } from "../data/newsKeywordMap";
 
 const News = () => {
   const location = useLocation();
@@ -9,75 +9,84 @@ const News = () => {
   const { topics = [], city = "" } = location.state || {};
 
   const [articlesByTopic, setArticlesByTopic] = useState({});
+  const [loading, setLoading] = useState(true);
+
+  const apiKey = import.meta.env.VITE_NEWS_API_KEY;
 
   useEffect(() => {
     const fetchArticles = async () => {
-      const apiKey = import.meta.env.VITE_NEWS_API_KEY;
-      const baseUrl = "https://newsapi.org/v2/everything";
-      const fromDate = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
-
-      const fetchedData = {};
+      setLoading(true);
+      const results = {};
 
       for (const topic of topics) {
-        const query = encodeURIComponent(topic.split(" ")[0]);
-        const url = `${baseUrl}?q=${query}&from=${fromDate}&sortBy=publishedAt&language=en&apiKey=${apiKey}`;
+        const keywords = newsKeywordMap[topic];
+        if (!keywords || keywords.length === 0) continue;
+
+        const query = encodeURIComponent(keywords.join(" OR "));
+        const url = `https://newsapi.org/v2/everything?q=${query}&pageSize=5&sortBy=publishedAt&language=en&apiKey=${apiKey}`;
 
         try {
-          const response = await fetch(url);
-          const data = await response.json();
-          if (data.articles && data.articles.length > 0) {
-            fetchedData[topic] = data.articles.slice(0, 3);
-          } else {
-            fetchedData[topic] = [];
-          }
+          const res = await fetch(url);
+          const data = await res.json();
+          const articles = (data.articles || [])
+            .filter((article) => {
+              const publishedDate = new Date(article.publishedAt);
+              const threeDaysAgo = new Date();
+              threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+              return publishedDate > threeDaysAgo;
+            })
+            .slice(0, 3);
+
+          results[topic] = articles;
         } catch (err) {
-          fetchedData[topic] = [];
+          results[topic] = [];
         }
       }
 
-      setArticlesByTopic(fetchedData);
+      setArticlesByTopic(results);
+      setLoading(false);
     };
 
     fetchArticles();
   }, [topics]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100 text-midnight p-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-pink-100 to-purple-100 text-midnight p-6">
       <div className="max-w-5xl mx-auto">
-        <h1 className="text-3xl font-script text-center mb-8">
-          Fresh Finds for Tonight's Talk 🗞️
-        </h1>
+        <h1 className="text-3xl font-script text-center mb-10">Tonight's Headlines ✨</h1>
 
-        {topics.map((topic, index) => (
-          <div key={index} className="mb-8">
-            <h2 className="text-xl font-bold mb-2">{topic}</h2>
-            {articlesByTopic[topic] && articlesByTopic[topic].length > 0 ? (
-              <ul className="list-disc list-inside space-y-2">
-                {articlesByTopic[topic].map((article, i) => (
-                  <li key={i}>
-                    <a
-                      href={article.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-700 underline hover:text-purple-600"
-                    >
+        {loading ? (
+          <p className="text-center">Loading news just for you...</p>
+        ) : (
+          topics.map((topic) => (
+            <div key={topic} className="mb-8">
+              <h2 className="text-xl font-bold mb-3">{topic}</h2>
+              {articlesByTopic[topic] && articlesByTopic[topic].length > 0 ? (
+                articlesByTopic[topic].map((article, index) => (
+                  <div key={index} className="mb-4">
+                    <a href={article.url} target="_blank" rel="noopener noreferrer" className="font-semibold underline hover:text-purple-600">
                       {article.title}
-                    </a>{" "}
-                    <span className="text-sm text-gray-600">
-                      ({new Date(article.publishedAt).toLocaleDateString("en-US")})
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="italic text-sm text-gray-600">
-                No fresh headlines right now... but this topic is still totally talk-worthy. 😉
-              </p>
-            )}
-          </div>
-        ))}
+                    </a>
+                    <p className="text-sm text-gray-600">
+                      {new Date(article.publishedAt).toLocaleDateString(undefined, {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric"
+                      })}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <p className="italic text-gray-700">
+  Okay, not every article is a perfect match. That’s dating… and AI! 😅 But you’re still interesting — so, keep it going!
+</p>
 
-        <div className="flex justify-between mt-10">
+              )}
+            </div>
+          ))
+        )}
+
+        <div className="flex justify-between mt-12">
           <button
             onClick={() => navigate("/tonightstalktips", { state: { topics, city } })}
             className="bg-white text-midnight font-medium px-5 py-2 rounded-full shadow hover:scale-105 transition-transform"
@@ -85,10 +94,10 @@ const News = () => {
             ← Back to Tips
           </button>
           <button
-            onClick={() => navigate("/events", { state: { city } })}
+            onClick={() => navigate("/events", { state: { topics, city } })}
             className="bg-white text-midnight font-semibold px-6 py-2 rounded-full shadow hover:scale-105 transition-transform"
           >
-            Next: Local Events →
+            On Tonight in {city} →
           </button>
         </div>
       </div>
@@ -97,3 +106,4 @@ const News = () => {
 };
 
 export default News;
+

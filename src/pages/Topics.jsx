@@ -1,5 +1,3 @@
-// src/pages/Topics.jsx
-
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -10,7 +8,7 @@ const topicSections = {
     "Travel 🌍",
     "Food & Drinks 🥓",
     "Dating & Relationships ❤️",
-    "Business & Money 💼",
+    "Business & Money 💼"
   ],
   "Culture & Entertainment 🎬": [
     "Film 🎬",
@@ -20,7 +18,7 @@ const topicSections = {
     "Music 🎵",
     "Fashion 👗",
     "Shopping 🛍️",
-    "Video Games 🎮",
+    "Video Games 🎮"
   ],
   "Sports 🏆": [
     "Football 🏈",
@@ -28,7 +26,7 @@ const topicSections = {
     "Baseball ⚾",
     "Hockey 🏒",
     "College Sports 🎓",
-    "Golf ⛳",
+    "Golf ⛳"
   ],
   "What’s Hot 🔥": [
     "Award Shows 🏆",
@@ -38,15 +36,45 @@ const topicSections = {
     "Celebrity Scandals 🔥",
     "Pop Culture Buzz 💥",
     "Weird Holidays 🧁",
-    "Astrology 🧿",
-  ],
+    "Astrology 🧿"
+  ]
+};
+
+const valueMap = {
+  "Politics 🗳️": "Politics 🗳️",
+  "Tech & Gadgets 💻": "Tech & Gadgets 🖥️",
+  "Travel 🌍": "Travel 🌍",
+  "Food & Drinks 🥓": "Food & Drinks 🥓",
+  "Dating & Relationships ❤️": "Dating & Relationships ❤️",
+  "Business & Money 💼": "Business & Money 💼",
+  "Film 🎬": "Film 🎬",
+  "TV & Streaming 📺": "TV Finales 📺",
+  "Reality TV 💅": "Reality TV 💅",
+  "Celebrity News 🌟": "Pop Culture Buzz 💥",
+  "Music 🎵": "Pop Culture Buzz 💥",
+  "Fashion 👗": "Fashion 👗",
+  "Shopping 🛍️": "Pop Culture Buzz 💥",
+  "Video Games 🎮": "Pop Culture Buzz 💥",
+  "Football 🏈": "Football 🏈",
+  "Basketball 🏀": "Basketball 🏀",
+  "Baseball ⚾": "Baseball ⚾",
+  "Hockey 🏒": "Hockey 🏒",
+  "College Sports 🎓": "College Sports 🎓",
+  "Golf ⛳": "Wildcard 🤔",
+  "Award Shows 🏆": "Trending Events 🎉",
+  "Major Races 🐎": "Trending Events 🎉",
+  "Festivals 🎊": "Trending Events 🎉",
+  "TV Finales 📺": "TV Finales 📺",
+  "Celebrity Scandals 🔥": "Pop Culture Buzz 💥",
+  "Pop Culture Buzz 💥": "Pop Culture Buzz 💥",
+  "Weird Holidays 🧁": "Trending Events 🎉",
+  "Astrology 🧿": "Astrology 🪐"
 };
 
 const Topics = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { userName = "J", dateName = "your date", city = "" } = location.state || {};
-
   const [selectedTopics, setSelectedTopics] = useState([]);
 
   const toggleTopic = (topic) => {
@@ -56,17 +84,16 @@ const Topics = () => {
   };
 
   const handleNext = () => {
-    const actualTopics = [...selectedTopics];
-    const wildcardIndex = actualTopics.indexOf("Wildcard Convo 💬");
-
+    const mappedTopics = selectedTopics.map((label) => valueMap[label] || label);
+    const wildcardIndex = mappedTopics.indexOf("Wildcard Convo 💬");
     if (wildcardIndex !== -1) {
-      const allTopics = Object.values(topicSections).flat();
-      const randomTopic = allTopics[Math.floor(Math.random() * allTopics.length)];
-      actualTopics[wildcardIndex] = randomTopic;
+      const allLabels = Object.values(topicSections).flat();
+      const randomLabel = allLabels[Math.floor(Math.random() * allLabels.length)];
+      mappedTopics[wildcardIndex] = valueMap[randomLabel] || randomLabel;
     }
 
     navigate("/tonightstalktips", {
-      state: { userName, dateName, city, topics: actualTopics },
+      state: { userName, dateName, city, topics: mappedTopics }
     });
   };
 
@@ -105,7 +132,6 @@ const Topics = () => {
           </div>
         ))}
 
-        {/* Wildcard Convo Separate Box */}
         <div className="mt-10 mb-10">
           <h2 className="text-xl font-bold mb-2">❓ Not sure what to talk about tonight?</h2>
           <label
@@ -124,6 +150,13 @@ const Topics = () => {
             🎲 Wildcard Convo 💬 — We’ll surprise you!
           </label>
         </div>
+
+        {/* 🔥 Flirty warning if too many selected */}
+        {selectedTopics.length > 6 && (
+          <div className="text-center text-pink-700 font-medium mb-6 text-lg">
+            Whoa 😅 You’re ready to talk all night! Want to narrow it down to your top 5 or 6?
+          </div>
+        )}
 
         <div className="flex justify-between">
           <button

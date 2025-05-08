@@ -42,13 +42,21 @@ const Welcome = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 w-full max-w-md flex flex-col items-center">
-        <h1 className="text-6xl font-script text-midnight mb-3 drop-shadow-glow">
-          Talk More Tonight
-        </h1>
-        <p className="text-lg text-midnight italic mb-6">
-          A quick and easy way to talk more tonight. A little magic and a lot of fun✨ Talk to Us before you talk to Them.
-        </p>
+      <div className="relative z-10 w-full max-w-lg flex flex-col items-center">
+       
+      <h1 className="text-5xl sm:text-6xl font-script text-midnight mb-4 drop-shadow-glow whitespace-nowrap">
+  ✨ Talk More Tonight ✨
+</h1>
+
+<p className="text-center text-lg mb-3 text-midnight">
+  A quick and easy way to spark better conversation.
+</p>
+<p className="text-center text-lg mb-6 text-midnight">
+  A little magic - a lot of fun — and a way to feel ready before your date.
+</p>
+<p className="text-center text-base text-purple-700 font-medium mb-8 animate-pulse">
+  💬 Tell us who you’re talking to tonight...
+</p>
 
         <div className="flex flex-col gap-4 w-full mb-8">
           <input

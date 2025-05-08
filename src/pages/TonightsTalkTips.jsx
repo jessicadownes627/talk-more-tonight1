@@ -1,6 +1,5 @@
-// src/pages/TonightsTalkTips.jsx
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { promptData, genericFallbacks } from "../data/promptData";
 
@@ -11,6 +10,20 @@ const TonightsTalkTips = () => {
 
   const getRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
+  // Deduplicate topics while preserving order
+  const uniqueTopics = [...new Set(topics)];
+
+  // If Wildcard 🤔 is in the list, replace it with a random real topic (not Wildcard or Trending)
+  const resolvedTopics = uniqueTopics.map((topic) => {
+    if (topic === "Wildcard 🤔") {
+      const eligible = Object.keys(promptData).filter(
+        (key) => key !== "Wildcard 🤔" && key !== "Trending Events 🎉"
+      );
+      return getRandom(eligible);
+    }
+    return topic;
+  });
+
   const buildTip = (topic) => {
     const data = promptData[topic] || {};
     return {
@@ -18,14 +31,14 @@ const TonightsTalkTips = () => {
       summary: data.summary || "This topic could totally win someone over.",
       fact: getRandom(data.facts || genericFallbacks.facts),
       ask: getRandom(data.ask || genericFallbacks.ask),
-      open: getRandom(data.open || genericFallbacks.open),
+      open: getRandom(data.open || genericFallbacks.open)
     };
   };
 
-  const [tips, setTips] = useState(topics.map(buildTip));
+  const [tips, setTips] = useState(resolvedTopics.map(buildTip));
 
   const shuffleTips = () => {
-    setTips(topics.map(buildTip));
+    setTips(resolvedTopics.map(buildTip));
   };
 
   return (
@@ -65,7 +78,7 @@ const TonightsTalkTips = () => {
             ← Back
           </button>
           <button
-            onClick={() => navigate("/news", { state: { topics, city } })}
+            onClick={() => navigate("/news", { state: { topics: resolvedTopics, city } })}
             className="bg-white text-midnight font-semibold px-6 py-2 rounded-full shadow hover:scale-105 transition-transform"
           >
             Next: Here's the Headlines →
@@ -77,3 +90,4 @@ const TonightsTalkTips = () => {
 };
 
 export default TonightsTalkTips;
+
