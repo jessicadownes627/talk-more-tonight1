@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Welcome = () => {
-  const navigate = useNavigate();
-  const [userName, setUserName] = useState("");
-  const [dateName, setDateName] = useState("");
-  const [city, setCity] = useState("");
+const navigate = useNavigate();
+const [userName, setUserName] = useState("");
+const [dateName, setDateName] = useState("");
+const [city, setCity] = useState("");
+const [zip, setZip] = useState("");
+
 
   useEffect(() => {
     document.body.classList.add("fade-in");
@@ -17,6 +19,7 @@ const Welcome = () => {
         userName,
         dateName,
         city,
+        zip,
       },
     });
   };
@@ -58,29 +61,43 @@ const Welcome = () => {
   💬 Tell us who you’re talking to tonight...
 </p>
 
-        <div className="flex flex-col gap-4 w-full mb-8">
-          <input
-            type="text"
-            placeholder="Your name"
-            value={userName}
-            onChange={(e) => setUserName(e.target.value)}
-            className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400 bg-white bg-opacity-80"
-          />
-          <input
-            type="text"
-            placeholder="Date's name"
-            value={dateName}
-            onChange={(e) => setDateName(e.target.value)}
-            className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white bg-opacity-80"
-          />
-          <input
-            type="text"
-            placeholder="City"
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white bg-opacity-80"
-          />
-        </div>
+<div className="flex flex-col gap-4 w-full mb-8">
+  <input
+    type="text"
+    placeholder="Your name"
+    value={userName}
+    onChange={(e) => setUserName(e.target.value)}
+    className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400 bg-white bg-opacity-80"
+  />
+  <input
+    type="text"
+    placeholder="Date's name"
+    value={dateName}
+    onChange={(e) => setDateName(e.target.value)}
+    className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white bg-opacity-80"
+  />
+  <div className="flex flex-col sm:flex-row gap-4">
+    <input
+      type="text"
+      placeholder="City (e.g. Springfield)"
+      value={city}
+      onChange={(e) => setCity(e.target.value)}
+      className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white bg-opacity-80"
+    />
+    <input
+      type="text"
+      placeholder="ZIP code (optional)"
+      value={zip}
+      onChange={(e) => setZip(e.target.value)}
+      className="w-full sm:w-44 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white bg-opacity-80"
+
+    />
+  </div>
+  <p className="text-sm text-purple-700 italic mt-1">
+    ZIP helps us get your weather right — but both are welcome!
+  </p>
+</div>
+
 
         <button
   onClick={handleStart}
