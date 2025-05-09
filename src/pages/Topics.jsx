@@ -74,7 +74,7 @@ const valueMap = {
 const Topics = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { userName = "J", dateName = "your date", city = "" } = location.state || {};
+  const { userName = "J", dateName = "your date", city = "", zip = "" } = location.state || {};
   const [selectedTopics, setSelectedTopics] = useState([]);
 
   const toggleTopic = (topic) => {
@@ -93,7 +93,7 @@ const Topics = () => {
     }
 
     navigate("/tonightstalktips", {
-      state: { userName, dateName, city, topics: mappedTopics }
+      state: { userName, dateName, city, zip, topics: mappedTopics }
     });
   };
 

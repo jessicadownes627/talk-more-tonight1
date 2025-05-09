@@ -1,28 +1,33 @@
-import React, { createContext, useState, useContext } from "react";
+// src/context/UserContext.jsx
+import { createContext, useState } from "react";
 
-const UserContext = createContext();
+// Named export so other files can use it
+export const UserContext = createContext();
 
-export function UserProvider({ children }) {
-  const [user, setUser] = useState({ name: "", dateName: "", city: "" });
-  const [selectedTopics, setSelectedTopics] = useState([]);
-  const [customTopic, setCustomTopic] = useState("");
-
+export const UserProvider = ({ children }) => {
+  const [userName, setUserName] = useState("");
+  const [dateName, setDateName] = useState("");
+  const [city, setCity] = useState("");
+  const [selectedTopics, setSelectedTopics] = useState([
+    "Politics 🗳️",
+    "Football 🏈",
+    "Wildcard ❔"
+  ]);
+  
   return (
     <UserContext.Provider
       value={{
-        user,
-        setUser,
+        userName,
+        setUserName,
+        dateName,
+        setDateName,
+        city,
+        setCity,
         selectedTopics,
         setSelectedTopics,
-        customTopic,
-        setCustomTopic,
       }}
     >
       {children}
     </UserContext.Provider>
   );
-}
-
-export function useUserContext() {
-  return useContext(UserContext);
-}
+};

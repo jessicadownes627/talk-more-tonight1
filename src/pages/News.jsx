@@ -1,103 +1,86 @@
-
-import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { UserContext } from "../context/UserContext";
 import { newsKeywordMap } from "../data/newsKeywordMap";
 
+const mockHeadlines = {
+  "Politics 🗳️": [
+    {
+      title: "Congress Debates 2025 Tax Plan",
+      url: "https://example.com/politics1",
+      publishedAt: "2025-05-08T10:00:00Z"
+    },
+    {
+      title: "Trump Comments on Primary Field",
+      url: "https://example.com/politics2",
+      publishedAt: "2025-05-07T12:00:00Z"
+    }
+  ],
+  "Football 🏈": [
+    {
+      title: "Rookie QB Shines in First Practice",
+      url: "https://example.com/football1",
+      publishedAt: "2025-05-08T14:00:00Z"
+    }
+  ],
+  "Wildcard ❔": [
+    {
+      title: "5 Surprising Facts About First Dates",
+      url: "https://example.com/wildcard1",
+      publishedAt: "2025-05-07T16:00:00Z"
+    },
+    {
+      title: "Why People Are Talking About AI Over Dinner",
+      url: "https://example.com/wildcard2",
+      publishedAt: "2025-05-06T09:00:00Z"
+    }
+  ]
+};
+
 const News = () => {
-  const location = useLocation();
+  const { selectedTopics } = useContext(UserContext);
   const navigate = useNavigate();
-  const { topics = [], city = "" } = location.state || {};
-
-  const [articlesByTopic, setArticlesByTopic] = useState({});
-  const [loading, setLoading] = useState(true);
-
-  const apiKey = import.meta.env.VITE_NEWS_API_KEY;
-
-  useEffect(() => {
-    const fetchArticles = async () => {
-      setLoading(true);
-      const results = {};
-
-      for (const topic of topics) {
-        const keywords = newsKeywordMap[topic];
-        if (!keywords || keywords.length === 0) continue;
-
-        const query = encodeURIComponent(keywords.join(" OR "));
-        const url = `https://newsapi.org/v2/everything?q=${query}&pageSize=5&sortBy=publishedAt&language=en&apiKey=${apiKey}`;
-
-        try {
-          const res = await fetch(url);
-          const data = await res.json();
-          const articles = (data.articles || [])
-            .filter((article) => {
-              const publishedDate = new Date(article.publishedAt);
-              const threeDaysAgo = new Date();
-              threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-              return publishedDate > threeDaysAgo;
-            })
-            .slice(0, 3);
-
-          results[topic] = articles;
-        } catch (err) {
-          results[topic] = [];
-        }
-      }
-
-      setArticlesByTopic(results);
-      setLoading(false);
-    };
-
-    fetchArticles();
-  }, [topics]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-pink-100 to-purple-100 text-midnight p-6">
-      <div className="max-w-5xl mx-auto">
-        <h1 className="text-3xl font-script text-center mb-10">Tonight's Headlines ✨</h1>
+    <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-200 to-blue-100 text-midnight px-6 py-8">
+      <div className="max-w-3xl mx-auto bg-white bg-opacity-50 p-6 rounded-2xl shadow-md backdrop-blur-sm">
+        <h1 className="text-3xl font-bold mb-6 text-center">
+          🗞️ Mock Headlines to Talk About
+        </h1>
 
-        {loading ? (
-          <p className="text-center">Loading news just for you...</p>
-        ) : (
-          topics.map((topic) => (
+        {Array.isArray(selectedTopics) &&
+          selectedTopics.map((topic) => (
             <div key={topic} className="mb-8">
-              <h2 className="text-xl font-bold mb-3">{topic}</h2>
-              {articlesByTopic[topic] && articlesByTopic[topic].length > 0 ? (
-                articlesByTopic[topic].map((article, index) => (
-                  <div key={index} className="mb-4">
-                    <a href={article.url} target="_blank" rel="noopener noreferrer" className="font-semibold underline hover:text-purple-600">
+              <h2 className="text-xl font-semibold mb-2">{topic}</h2>
+              <ul className="space-y-2">
+                {(mockHeadlines[topic] || mockHeadlines["Wildcard ❔"]).map((article, i) => (
+                  <li key={i}>
+                    <a
+                      href={article.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-700 underline"
+                    >
                       {article.title}
                     </a>
                     <p className="text-sm text-gray-600">
-                      {new Date(article.publishedAt).toLocaleDateString(undefined, {
+                      {new Date(article.publishedAt).toLocaleDateString("en-US", {
                         month: "short",
-                        day: "numeric",
-                        year: "numeric"
+                        day: "numeric"
                       })}
                     </p>
-                  </div>
-                ))
-              ) : (
-                <p className="italic text-gray-700">
-  Okay, not every article is a perfect match. That’s dating… and AI! 😅 But you’re still interesting — so, keep it going!
-</p>
-
-              )}
+                  </li>
+                ))}
+              </ul>
             </div>
-          ))
-        )}
+          ))}
 
-        <div className="flex justify-between mt-12">
+        <div className="mt-10 text-center">
           <button
-            onClick={() => navigate("/tonightstalktips", { state: { topics, city } })}
-            className="bg-white text-midnight font-medium px-5 py-2 rounded-full shadow hover:scale-105 transition-transform"
+            onClick={() => navigate("/events")}
+            className="bg-pink-500 text-white text-lg py-2 px-6 rounded-full hover:bg-pink-600 transition"
           >
-            ← Back to Tips
-          </button>
-          <button
-            onClick={() => navigate("/events", { state: { topics, city } })}
-            className="bg-white text-midnight font-semibold px-6 py-2 rounded-full shadow hover:scale-105 transition-transform"
-          >
-            On Tonight in {city} →
+            💫 See What’s Happening Near You
           </button>
         </div>
       </div>
@@ -106,4 +89,3 @@ const News = () => {
 };
 
 export default News;
-

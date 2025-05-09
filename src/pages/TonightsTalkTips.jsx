@@ -6,7 +6,8 @@ import { promptData, genericFallbacks } from "../data/promptData";
 const TonightsTalkTips = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { topics = [], city = "" } = location.state || {};
+  const { topics = [], city = "", zip = "" } = location.state || {};
+
 
   const getRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
@@ -72,7 +73,7 @@ const TonightsTalkTips = () => {
 
         <div className="flex justify-between">
           <button
-            onClick={() => navigate("/topics", { state: { city } })}
+            onClick={() => navigate("/topics", { state: { city, zip } })}
             className="bg-white text-midnight font-medium px-5 py-2 rounded-full shadow hover:scale-105 transition-transform"
           >
             ← Back
