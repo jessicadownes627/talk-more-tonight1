@@ -1,5 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useUser } from "../context/UserContext";
+import energyThemes from "../data/energyThemes";
+import PageHeader from "../components/PageHeader";
+
 
 const topicSections = {
   "Smart & Curious 🧠": [
@@ -74,7 +78,11 @@ const valueMap = {
 const Topics = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { userName = "J", dateName = "your date", city = "" } = location.state || {};
+  const { userData } = useUser();
+  const { energy = "Dreamy ✨" } = userData;
+  const theme = energyThemes[energy];
+
+  const { name: userName = "J", dateName = "your date", city = "", zip = "" } = userData;
   const [selectedTopics, setSelectedTopics] = useState([]);
 
   const toggleTopic = (topic) => {
@@ -93,17 +101,17 @@ const Topics = () => {
     }
 
     navigate("/tonightstalktips", {
-      state: { userName, dateName, city, topics: mappedTopics }
+      state: { userName, dateName, city, zip, topics: mappedTopics }
     });
   };
 
   const wildcardSelected = selectedTopics.includes("Wildcard Convo 💬");
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-300 via-purple-200 to-blue-200 text-midnight p-6">
+    <div className={`min-h-screen bg-gradient-to-br ${theme.background} ${theme.text} p-6`}>
       <div className="max-w-5xl mx-auto">
         <h1 className="text-3xl font-script text-center mb-10">
-          {userName}, what is your date into... <span className="italic">besides YOU! 😉</span>
+          {userName}, what is your date into...? <span className="italic">Besides YOU! 😉</span>
         </h1>
 
         {Object.entries(topicSections).map(([section, topics]) => (
@@ -151,7 +159,6 @@ const Topics = () => {
           </label>
         </div>
 
-        {/* 🔥 Flirty warning if too many selected */}
         {selectedTopics.length > 6 && (
           <div className="text-center text-pink-700 font-medium mb-6 text-lg">
             Whoa 😅 You’re ready to talk all night! Want to narrow it down to your top 5 or 6?
@@ -167,7 +174,7 @@ const Topics = () => {
           </button>
           <button
             onClick={handleNext}
-            className="bg-white text-midnight font-semibold px-6 py-2 rounded-full shadow hover:scale-105 transition-transform"
+            className={`${theme.button} text-white font-semibold px-6 py-2 rounded-full shadow hover:scale-105 transition-transform`}
           >
             Next Up: Tonight's Talk Tips →
           </button>

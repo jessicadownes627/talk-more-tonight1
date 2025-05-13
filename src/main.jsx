@@ -1,12 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
-import './utils/index.css'; // or './index.css' if it’s in the root
+import './utils/index.css';
 
 import { BrowserRouter } from 'react-router-dom';
+import { UserProvider } from './context/UserContext'; // ✅ Add this line
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <BrowserRouter>
-    <App />
-  </BrowserRouter>
+  <React.StrictMode>
+    <BrowserRouter>
+      <UserProvider>
+        <App />
+      </UserProvider>
+    </BrowserRouter>
+  </React.StrictMode>
 );

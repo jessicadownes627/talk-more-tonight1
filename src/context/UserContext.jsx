@@ -2,27 +2,23 @@ import React, { createContext, useState, useContext } from "react";
 
 const UserContext = createContext();
 
-export function UserProvider({ children }) {
-  const [user, setUser] = useState({ name: "", dateName: "", city: "" });
-  const [selectedTopics, setSelectedTopics] = useState([]);
-  const [customTopic, setCustomTopic] = useState("");
+export const UserProvider = ({ children }) => {
+  const [userData, setUserData] = useState({
+    name: "",
+    dateName: "",
+    city: "",
+    state: "",
+    zip: "",
+    energy: "Dreamy ✨",
+    selectedTopics: [],
+  });
 
   return (
-    <UserContext.Provider
-      value={{
-        user,
-        setUser,
-        selectedTopics,
-        setSelectedTopics,
-        customTopic,
-        setCustomTopic,
-      }}
-    >
+    <UserContext.Provider value={{ userData, setUserData }}>
       {children}
     </UserContext.Provider>
   );
-}
+};
 
-export function useUserContext() {
-  return useContext(UserContext);
-}
+export const useUser = () => useContext(UserContext);
+

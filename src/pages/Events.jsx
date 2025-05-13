@@ -1,150 +1,147 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "../context/UserContext";
+import energyThemes from "../data/energyThemes";
+import PageHeader from "../components/PageHeader";
+
+const fallbackIdeas = [
+  "🍦 Grab ice cream and walk around your favorite area",
+  "🌇 Catch golden hour at a rooftop or overlook",
+  "🎯 Find a bar with arcade games, darts, or shuffleboard"
+];
+
+const sparkQuestions = [
+  "What’s a weird skill you wish you had?",
+  "If you had to eat one meal for the rest of your life, what would it be?",
+  "Who’s someone (living or not) you’d love to meet, and why?"
+];
+
+const confidenceLines = [
+  "You’re thoughtful, you’re curious — that already makes this date different.",
+  "Prepared beats perfect. You’ve got this.",
+  "Whatever happens tonight, you showed up ready. That counts."
+];
+
+const topicIdeasMap = {
+  "Music 🎵": "Go to a record store or share playlists over drinks.",
+  "Film 🎬": "Catch a movie or check out an indie cinema.",
+  "Celebrity News 🌟": "Try a trendy restaurant or spot where celebrities have been.",
+  "Reality TV 💅": "Play a lighthearted game like 'who would win' — reality edition.",
+  "Video Games 🎮": "Go to an arcade bar or play co-op games together.",
+  "Football 🏈": "Catch part of the game at a sports bar.",
+  "Basketball 🏀": "Shoot some hoops at a park or talk favorite teams over drinks.",
+  "Baseball ⚾": "Grab snacks and head to a local minor league game.",
+  "Hockey 🏒": "Find a local game or grab wings and watch a match somewhere lively."
+};
 
 const Events = () => {
-  const location = useLocation();
   const navigate = useNavigate();
-  const { city = "", zip = "" } = location.state || {};
+  const { userData } = useUser();
+  const { userName, dateName, city, selectedTopics = [], energy = "Dreamy ✨" } = userData;
+  const theme = energyThemes[energy];
 
-  const [weather, setWeather] = useState(null);
-  const [weatherError, setWeatherError] = useState(false);
-
-  const mockSports = [
-    "⚾ Yankees vs Mets – Tonight 7:05 PM",
-    "🏀 Celtics beat Heat – Final 112–106",
-    "🏈 Chiefs vs Bills – Sunday 8:20 PM",
-  ];
-
-  const mockEvents = [
-    "🍷 Wine & Paint Night at The Palette Bar",
-    "🎶 Live Jazz at The Blue Note Lounge",
-    "🌮 Taco Fest 2025 – Downtown Plaza",
-  ];
-
-  const wouldYouRatherQuestions = [
-    "Would you rather kiss on the first date or wait until the third?",
-    "Would you rather share dessert or order your own?",
-    "Would you rather flirt over text or face-to-face?",
-    "Would you rather have sparks or comfort right away?",
-    "Would you rather go on a mystery date or plan the whole thing?",
-    "Would you rather have a rooftop date or a beach walk?",
-    "Would you rather match music tastes or food tastes?",
-    "Would you rather fight one horse-sized duck or 100 duck-sized horses?",
-    "Would you rather always have to sing instead of speak or dance everywhere you go?",
-    "Would you rather be stuck in a rom-com or an action movie for a day?",
-    "Would you rather only eat tacos or only eat pizza for the rest of your life?",
-    "Would you rather time travel to the past or the future?",
-    "Would you rather have a rewind button or a pause button for your life?",
-    "Would you rather be famous for something embarrassing or unknown for something amazing?"
-  ];
-
-  const [questions, setQuestions] = useState([]);
+  const [spark, setSpark] = useState("");
+  const [confidence, setConfidence] = useState("");
 
   useEffect(() => {
-    shuffleQuestions();
+    const rand = (arr) => arr[Math.floor(Math.random() * arr.length)];
+    setSpark(rand(sparkQuestions));
+    setConfidence(rand(confidenceLines));
   }, []);
 
-  const shuffleQuestions = () => {
-    const shuffled = [...wouldYouRatherQuestions].sort(() => 0.5 - Math.random());
-    setQuestions(shuffled.slice(0, 3));
-  };
-
-  useEffect(() => {
-    const fetchWeather = async () => {
-      const apiKey = import.meta.env.VITE_WEATHER_API_KEY;
-      if (!apiKey || (!city && !zip)) {
-        setWeatherError(true);
-        return;
-      }
-
-      const query = zip ? zip : `${city},US`; // Use ZIP if available, fallback to city
-      const url = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${encodeURIComponent(query)}`;
-
-      try {
-        const response = await fetch(url);
-        const data = await response.json();
-
-        if (data && data.current) {
-          setWeather({
-            temp: data.current.temp_f,
-            condition: data.current.condition.text,
-          });
-          setWeatherError(false);
-        } else {
-          setWeatherError(true);
-        }
-      } catch (error) {
-        console.error("Weather API failed:", error);
-        setWeatherError(true);
-      }
-    };
-
-    fetchWeather();
-  }, [city, zip]);
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 text-midnight p-6">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-script text-center mb-6">What’s Happening Tonight ✨</h1>
+    <div className={`min-h-screen bg-gradient-to-br ${theme.background} ${theme.text} px-6 py-8`}>
+      <div className="max-w-3xl mx-auto">
+        <PageHeader
+          emoji="🌟"
+          subtitle={`Here's a little inspiration before you talk to ${dateName} in ${city}.`}
+        />
 
-        {city && !weatherError && weather ? (
-          <div className="bg-white rounded-xl shadow p-4 mb-6">
-            <h2 className="text-lg font-semibold mb-1">🌤️ Weather in {city}{zip ? `, ${zip}` : ""}</h2>
-            <p>{weather.temp}°F — {weather.condition}</p>
-          </div>
-        ) : (
-          <div className="bg-white rounded-xl shadow p-4 mb-6">
-            <h2 className="text-lg font-semibold mb-1">🌤️ Weather</h2>
-            <p className="text-gray-600 italic">Couldn’t fetch the weather — but the night’s still full of possibilities. ✨</p>
-          </div>
-        )}
+        {/* Local Events Placeholder */}
+        <div className="bg-white bg-opacity-40 backdrop-blur-md rounded-xl p-6 mb-8 shadow-xl">
+          <h2 className="text-xl font-semibold mb-4 text-midnight">
+            🎫 Local Events in {city}
+          </h2>
+          <p className="italic text-midnight">
+            Local events coming soon! In the meantime, here are a few fun date ideas and things to talk about...
+          </p>
+        </div>
 
-        <div className="bg-white rounded-xl shadow p-4 mb-6">
-          <h2 className="text-lg font-semibold mb-2">🏟️ Major Matchups</h2>
-          <ul className="list-disc list-inside">
-            {mockSports.map((game, i) => (
-              <li key={i}>{game}</li>
+        {/* Tailored Date Ideas Based on Topics */}
+        <div className="bg-white bg-opacity-40 backdrop-blur-md rounded-xl p-6 mb-8 shadow-xl">
+          <h2 className="text-xl font-semibold mb-4 text-midnight">
+            💡 Based on Their Interests
+          </h2>
+          {selectedTopics.length > 0 ? (
+            <ul className="list-disc list-inside text-midnight text-sm">
+              {selectedTopics.map((topic) => (
+                <li key={topic}>
+                  <span className="font-semibold">{topic}:</span>{" "}
+                  {topicIdeasMap[topic] || "Do something casual and personal that lets you chat and connect."}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-midnight italic">We'll match suggestions once you tell us what they're into!</p>
+          )}
+        </div>
+
+        {/* Spark a Conversation */}
+        <div className="bg-white bg-opacity-40 backdrop-blur-md rounded-xl p-6 mb-6">
+          <h2 className="text-lg font-semibold mb-2 text-midnight">
+            💬 Spark a Conversation
+          </h2>
+          <p className="italic text-midnight">{spark}</p>
+        </div>
+
+        {/* Real Talk Section */}
+        <div className="bg-white bg-opacity-40 backdrop-blur-md rounded-xl p-6 mb-6">
+          <h2 className="text-lg font-semibold mb-2 text-midnight">
+            💌 Real Stories/Advice
+          </h2>
+          <p className="italic text-midnight mb-2">
+            “I once told my date I was nervous — and they said they were too. We laughed, relaxed, and had the best night.”
+          </p>
+          <p className="text-sm text-midnight">
+            Got a story or wisdom to share? Need some dating advice? Email us at{' '}
+            <a href="mailto:talkmoretonight@gmail.com" className="underline hover:text-purple-700">
+              talkmoretonight@gmail.com
+            </a>
+          </p>
+        </div>
+
+        {/* Confidence Boost */}
+        <div className="bg-white bg-opacity-40 backdrop-blur-md rounded-xl p-6 mb-6">
+          <h2 className="text-lg font-semibold mb-2 text-midnight">
+            💖 Quick Reminder
+          </h2>
+          <p className="italic text-midnight">{confidence}</p>
+        </div>
+
+        {/* Bonus Ideas */}
+        <div className="bg-white bg-opacity-40 backdrop-blur-md rounded-xl p-6 mb-6">
+          <h2 className="text-lg font-semibold mb-2 text-midnight">
+            ✨ Need More Ideas?
+          </h2>
+          <ul className="list-disc list-inside text-sm text-midnight">
+            {fallbackIdeas.sort(() => 0.5 - Math.random()).slice(0, 2).map((idea, i) => (
+              <li key={i}>{idea}</li>
             ))}
           </ul>
         </div>
 
-        <div className="bg-white rounded-xl shadow p-4 mb-6">
-          <h2 className="text-lg font-semibold mb-2">🎉 Local Vibes</h2>
-          <ul className="list-disc list-inside">
-            {mockEvents.map((event, i) => (
-              <li key={i}>{event}</li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="bg-white rounded-xl shadow p-4 mb-6">
-          <h2 className="text-lg font-semibold mb-2">🌀 Would You Rather…?</h2>
-          <p className="text-gray-700 italic mb-2">If all else fails, these will save the convo 😏</p>
-          <ul className="list-disc list-inside">
-            {questions.map((q, i) => (
-              <li key={i}>{q}</li>
-            ))}
-          </ul>
+        <div className="flex justify-between items-center mt-8">
           <button
-            onClick={shuffleQuestions}
-            className="mt-4 text-purple-600 hover:text-pink-600 underline transition-all"
-          >
-            🔁 Shuffle Questions
-          </button>
-        </div>
-
-        <div className="flex justify-between mt-10">
-          <button
-            onClick={() => navigate("/news", { state: { city, zip } })}
-            className="bg-white text-midnight font-medium px-5 py-2 rounded-full shadow hover:scale-105 transition-transform"
+            onClick={() => navigate("/news")}
+            className="bg-white text-midnight px-4 py-2 rounded-full text-sm hover:bg-gray-200 transition"
           >
             ← Back to News
           </button>
           <button
             onClick={() => navigate("/")}
-            className="bg-white text-midnight font-semibold px-6 py-2 rounded-full shadow hover:scale-105 transition-transform"
+            className={`${theme.button} text-white px-6 py-2 rounded-full text-sm hover:scale-105 transition-transform shadow-md`}
           >
-            Start Over
+            🔄 Start Over
           </button>
         </div>
       </div>
