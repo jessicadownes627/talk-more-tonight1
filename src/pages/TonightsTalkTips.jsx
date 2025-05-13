@@ -1,20 +1,23 @@
-
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { promptData, genericFallbacks } from "../data/promptData";
+import { useUser } from "../context/UserContext";
+import energyThemes from "../data/energyThemes";
+import PageHeader from "../components/PageHeader";
+
 
 const TonightsTalkTips = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { topics = [], city = "", zip = "" } = location.state || {};
-
+  const { userData } = useUser();
+  const { energy = "Dreamy ✨" } = userData;
+  const theme = energyThemes[energy];
 
   const getRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-  // Deduplicate topics while preserving order
   const uniqueTopics = [...new Set(topics)];
 
-  // If Wildcard 🤔 is in the list, replace it with a random real topic (not Wildcard or Trending)
   const resolvedTopics = uniqueTopics.map((topic) => {
     if (topic === "Wildcard 🤔") {
       const eligible = Object.keys(promptData).filter(
@@ -32,7 +35,7 @@ const TonightsTalkTips = () => {
       summary: data.summary || "This topic could totally win someone over.",
       fact: getRandom(data.facts || genericFallbacks.facts),
       ask: getRandom(data.ask || genericFallbacks.ask),
-      open: getRandom(data.open || genericFallbacks.open)
+      open: getRandom(data.open || genericFallbacks.open),
     };
   };
 
@@ -43,7 +46,7 @@ const TonightsTalkTips = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100 text-midnight p-6">
+    <div className={`min-h-screen bg-gradient-to-br ${theme.background} ${theme.text} p-6`}>
       <div className="max-w-5xl mx-auto">
         <h1 className="text-3xl font-script text-center mb-10">
           Stay sharp, look cute — here’s what’s going on 😉
@@ -80,7 +83,7 @@ const TonightsTalkTips = () => {
           </button>
           <button
             onClick={() => navigate("/news", { state: { topics: resolvedTopics, city } })}
-            className="bg-white text-midnight font-semibold px-6 py-2 rounded-full shadow hover:scale-105 transition-transform"
+            className={`${theme.button} text-white font-semibold px-6 py-2 rounded-full shadow hover:scale-105 transition-transform`}
           >
             Next: Here's the Headlines →
           </button>
@@ -91,4 +94,5 @@ const TonightsTalkTips = () => {
 };
 
 export default TonightsTalkTips;
+
 

@@ -1,7 +1,7 @@
-import React, { useContext } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import { UserContext } from "../context/UserContext";
-import { newsKeywordMap } from "../data/newsKeywordMap";
+import { useUser } from "../context/UserContext";
+import { newsKeywordMap } from "../data/newsKeywordMap"; // if needed later
 
 const mockHeadlines = {
   "Politics 🗳️": [
@@ -38,7 +38,8 @@ const mockHeadlines = {
 };
 
 const News = () => {
-  const { selectedTopics } = useContext(UserContext);
+  const { userData } = useUser();
+  const { selectedTopics = [] } = userData;
   const navigate = useNavigate();
 
   return (
@@ -48,32 +49,31 @@ const News = () => {
           🗞️ Mock Headlines to Talk About
         </h1>
 
-        {Array.isArray(selectedTopics) &&
-          selectedTopics.map((topic) => (
-            <div key={topic} className="mb-8">
-              <h2 className="text-xl font-semibold mb-2">{topic}</h2>
-              <ul className="space-y-2">
-                {(mockHeadlines[topic] || mockHeadlines["Wildcard ❔"]).map((article, i) => (
-                  <li key={i}>
-                    <a
-                      href={article.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-700 underline"
-                    >
-                      {article.title}
-                    </a>
-                    <p className="text-sm text-gray-600">
-                      {new Date(article.publishedAt).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric"
-                      })}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+        {selectedTopics.map((topic) => (
+          <div key={topic} className="mb-8">
+            <h2 className="text-xl font-semibold mb-2">{topic}</h2>
+            <ul className="space-y-2">
+              {(mockHeadlines[topic] || mockHeadlines["Wildcard ❔"]).map((article, i) => (
+                <li key={i}>
+                  <a
+                    href={article.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-700 underline"
+                  >
+                    {article.title}
+                  </a>
+                  <p className="text-sm text-gray-600">
+                    {new Date(article.publishedAt).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric"
+                    })}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
 
         <div className="mt-10 text-center">
           <button
@@ -89,3 +89,4 @@ const News = () => {
 };
 
 export default News;
+

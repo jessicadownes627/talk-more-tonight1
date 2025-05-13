@@ -56,6 +56,10 @@ body {
 
 /* Optional smoother focus rings on form elements */
 input:focus {
+  transition: box-shadow 0.2s ease;input:focus {
+    transition: box-shadow 0.2s ease;
+  }
+  
   outline: none;
   ring-width: 2px;
   ring-offset: 2px;

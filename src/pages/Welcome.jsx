@@ -1,112 +1,101 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../context/UserContext";
 
 const Welcome = () => {
-const navigate = useNavigate();
-const [userName, setUserName] = useState("");
-const [dateName, setDateName] = useState("");
-const [city, setCity] = useState("");
-const [zip, setZip] = useState("");
+  const navigate = useNavigate();
+  const { userData, setUserData } = useUser();
 
-
-  useEffect(() => {
-    document.body.classList.add("fade-in");
-  }, []);
+  const [name, setName] = useState(userData.name);
+  const [dateName, setDateName] = useState(userData.dateName);
+  const [city, setCity] = useState(userData.city);
+  const [state, setState] = useState(userData.state);
+  const [zip, setZip] = useState(userData.zip);
+  const [energy, setEnergy] = useState(userData.energy || "Dreamy ✨");
 
   const handleStart = () => {
-    navigate("/topics", {
-      state: {
-        userName,
-        dateName,
-        city,
-        zip,
-      },
-    });
+    setUserData({ ...userData, name, dateName, city, state, zip, energy });
+    navigate("/topics");
   };
-  
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-pink-300 via-purple-300 to-blue-300 flex flex-col justify-center items-center text-center p-6 overflow-hidden">
-      
-      {/* Starry Background */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        {[...Array(30)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-white rounded-full animate-pulseSlow"
-            style={{
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              opacity: Math.random() * 0.8 + 0.2,
-              animationDelay: `${Math.random() * 5}s`,
-            }}
-          ></div>
-        ))}
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-green-100 via-blue-100 to-purple-200 flex items-center justify-center px-4">
+      <div className="bg-white bg-opacity-70 p-8 rounded-3xl shadow-lg max-w-md w-full text-center">
+        <h1 className="text-4xl font-script text-midnight mb-2">Talk More Tonight</h1>
+        <div className="text-yellow-500 text-xl mb-2">✨</div>
+        <p className="text-midnight italic mb-6">
+          A dreamy dating concierge — for what to say, what to plan, and how to talk more tonight.
+        </p>
 
-      {/* Content */}
-      <div className="relative z-10 w-full max-w-lg flex flex-col items-center">
-       
-      <h1 className="text-5xl sm:text-6xl font-script text-midnight mb-4 drop-shadow-glow whitespace-nowrap">
-  ✨ Talk More Tonight ✨
-</h1>
-
-<p className="text-center text-lg mb-3 text-midnight">
-  A quick and easy way to spark better conversation.
-</p>
-<p className="text-center text-lg mb-6 text-midnight">
-  A little magic - a lot of fun — and a way to feel ready before your date.
-</p>
-<p className="text-center text-base text-purple-700 font-medium mb-8 animate-pulse">
-  💬 Tell us who you’re talking to tonight...
-</p>
-
-<div className="flex flex-col gap-4 w-full mb-8">
+        <div className="space-y-3">
   <input
     type="text"
     placeholder="Your name"
-    value={userName}
-    onChange={(e) => setUserName(e.target.value)}
-    className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400 bg-white bg-opacity-80"
+    className="w-full p-3 rounded-md text-midnight focus:outline-none focus:ring-2 focus:ring-purple-400"
+    value={name}
+    onChange={(e) => setName(e.target.value)}
   />
   <input
     type="text"
-    placeholder="Date's name"
+    placeholder="Date's name (optional)"
+    className="w-full p-3 rounded-md text-midnight focus:outline-none focus:ring-2 focus:ring-purple-400"
     value={dateName}
     onChange={(e) => setDateName(e.target.value)}
-    className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white bg-opacity-80"
   />
-  <div className="flex flex-col sm:flex-row gap-4">
-    <input
-      type="text"
-      placeholder="City (e.g. Springfield)"
-      value={city}
-      onChange={(e) => setCity(e.target.value)}
-      className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white bg-opacity-80"
-    />
-    <input
-      type="text"
-      placeholder="ZIP code (optional)"
-      value={zip}
-      onChange={(e) => setZip(e.target.value)}
-      className="w-full sm:w-44 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white bg-opacity-80"
-
-    />
-  </div>
-  <p className="text-sm text-purple-700 italic mt-1">
-    ZIP helps us get your weather right — but both are welcome!
-  </p>
+  <input
+    type="text"
+    placeholder="City"
+    className="w-full p-3 rounded-md text-midnight focus:outline-none focus:ring-2 focus:ring-purple-400"
+    value={city}
+    onChange={(e) => setCity(e.target.value)}
+  />
+  <input
+    type="text"
+    placeholder="State (e.g., NY)"
+    className="w-full p-3 rounded-md text-midnight focus:outline-none focus:ring-2 focus:ring-purple-400"
+    value={state}
+    onChange={(e) => setState(e.target.value)}
+  />
+  <input
+    type="text"
+    placeholder="ZIP Code"
+    className="w-full p-3 rounded-md text-midnight focus:outline-none focus:ring-2 focus:ring-purple-400"
+    value={zip}
+    onChange={(e) => setZip(e.target.value)}
+  />
 </div>
 
 
-        <button
-  onClick={handleStart}
-  className="bg-white text-midnight font-semibold text-lg px-6 py-3 rounded-full shadow-lg hover:scale-105 transition-transform duration-300 disabled:opacity-50"
-  disabled={!userName.trim()}
->
-  {userName ? `Let’s Talk, ${userName} ✨` : "Let’s Talk ✨"}
-</button>
+        <div className="mt-6">
+          <p className="text-midnight font-semibold mb-2">✨Choose your Energy ✨</p>
+          <div className="flex justify-center space-x-2">
+            <button
+              className={`px-4 py-2 rounded-full border ${energy === "Dreamy ✨" ? "bg-purple-100 border-purple-400" : "bg-white border-gray-300"}`}
+              onClick={() => setEnergy("Dreamy ✨")}
+            >
+              Dreamy ✨
+            </button>
+            <button
+              className={`px-4 py-2 rounded-full border ${energy === "Bold 🔥" ? "bg-yellow-100 border-yellow-400" : "bg-white border-gray-300"}`}
+              onClick={() => setEnergy("Bold 🔥")}
+            >
+              Bold 🔥
+            </button>
+            <button
+              className={`px-4 py-2 rounded-full border ${energy === "Chill 🌙" ? "bg-blue-100 border-blue-400" : "bg-white border-gray-300"}`}
+              onClick={() => setEnergy("Chill 🌙")}
+            >
+              Chill 🌙
+            </button>
+          </div>
+        </div>
 
+        <button
+          onClick={handleStart}
+          className="mt-6 w-full bg-gradient-to-r from-blue-400 to-purple-400 text-white py-3 rounded-full text-lg font-semibold shadow-md"
+        >
+          Let’s Talk
+        </button>
       </div>
     </div>
   );
